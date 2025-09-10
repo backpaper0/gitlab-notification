@@ -66,10 +66,10 @@ class GitLabNotificationService:
             logger.error(f"Failed to fetch GitLab todos: {e}")
             return []
 
-    def notify_owattayo(self, prompt: str, url: str) -> bool:
+    def notify_owattayo(self, body: str, url: str) -> bool:
         try:
             response = requests.post(
-                self.settings.owattayo_api_endpoint, json={"prompt": prompt, "url": url}
+                self.settings.owattayo_api_endpoint, json={"title": "GitLab To-Do", "body": body, "url": url}
             )
             response.raise_for_status()
             return True
@@ -100,9 +100,9 @@ class GitLabNotificationService:
             body = todo.get("body", "")
             target_url = todo.get("target_url", "")
 
-            prompt = f"{author_username}: {body}"
+            body = f"{author_username}: {body}"
 
-            if self.notify_owattayo(prompt, target_url):
+            if self.notify_owattayo(body, target_url):
                 logger.info(f"Notified Owattayo for todo {todo['id']}")
                 max_id = max(max_id, todo["id"])
             else:
